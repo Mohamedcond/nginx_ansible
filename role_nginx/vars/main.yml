@@ -1,0 +1,9 @@
+---
+# vars file for role_nginx
+
+dockerhub_login_vault: "{{ dockerhub_login }}"
+
+dockerhub_pwd_vault: "{{ dockerhub_pwd }}"
+
+github_private_key: "{{ github_private_key_vault }}"
+

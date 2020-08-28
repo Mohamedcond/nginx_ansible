@@ -1,0 +1,69 @@
+---
+
+# tasks file for role_ansible
+- name: Create a file
+  file:
+    path: "/home/centos/folder"
+    owner: centos
+    state: directory
+
+
+- name: Restart service docker
+  service:
+    name: docker
+    state: restarted
+
+- name: Create a network
+  docker_network:
+    name: network_ansible
+
+- name: Create a volume
+  docker_volume:
+    name: volume_one
+
+
+- name: load the source code in github
+  git:
+    repo: "https://github.com/nginxinc/docker-nginx.git"
+    dest: "/home/centos/folder"
+    version: "master"
+
+
+- name: Log into DockerHub
+  docker_login:
+    username: "{{ dockerhub_login_vault }}"
+    password: "{{ dockerhub_pwd_vault }}"
+
+
+- name: Build api image and push it to Docker Hub
+  docker_image:
+    path: /home/centos/folder/stable/alpine/
+    name: nginx_image
+    push: no
+    tag: v1
+
+- name: Log into DockerHub
+  docker_login:
+    username: "{{ dockerhub_login_vault }}"
+    password: "{{ dockerhub_pwd_vault }}"
+
+- name: Build an image and push it to a private repo
+  docker_image:
+    build:
+      path: "/home/centos/folder/stable/alpine/"
+    name: "{{ dockerhub_login_vault }}/nginx_image"
+    tag: v1
+    push: yes
+    source: build
+
+
+
+- name: Create nginx_container and connect to network
+  docker_container:
+    name:  nginx_container
+    image: "nginx_image:v1"
+    networks:
+      - name: "network_ansible"
+    state: started
+    restart: yes
+
