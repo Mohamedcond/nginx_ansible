@@ -67,3 +67,5 @@
     state: started
     restart: yes
 
+    ports:
+      - "8080:80"
